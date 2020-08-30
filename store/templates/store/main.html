@@ -1,10 +1,27 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>My Soko</title>
+    <link href="{% static 'css/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css'%}">
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+        maximum-scale=1, minimum-scale=1 "/>
+
 </head>
 <body>
 
+    <h1> Navbar </h1>
+    <hr>
+    <div class="container">
+        {% block content %}
+        {% endblock content%}
+
+    </div>
+
+    <script src="{% static 'css/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
 </body>
 </html>
