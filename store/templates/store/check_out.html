@@ -5,9 +5,10 @@
     <div class="row">
         <div class="col-lg-6">
             <div class="box-element" id="form-wrapper">
-                <p>Customer Information: </p>
+
                 <form id="form">
                     <div id="user-info">
+                        <p>Customer Information: </p>
                         <div class="form-field">
                             <input required type="text" class="form-control" name="name" placeholder="Name...">
                         </div>
@@ -15,11 +16,11 @@
                             <input required type="text" class="form-control" name="email" placeholder="Email address...">
                         </div>
                     </div>
-                    <div class="shipping-info">
+                    <div id="shipping-info">
                         <hr>
                         <p>Shipping Information: </p>
                         <div class="form-field">
-                            <input class="form-control" name="name" placeholder="Address..." type="text">
+                            <input class="form-control" name="address" placeholder="Address..." type="text">
                         </div>
                         <div class="form-field">
                             <input class="form-control" name="city" placeholder="City..." type="text">
@@ -39,21 +40,22 @@
 
             <br>
 
-            <div class="box-element hidden " id="payment-options">
+            <div class="box-element hidden " id="payment-info">
                 <small>Paypall Options</small>
+                <button id="make-payment" class="btn btn-success " >Make Payment</button>
             </div>
         </div>
 
         <div class="col-lg-6">
             <div class="box-element">
-                <a class="btn btn-outline-dark " href="{% url 'cart' %}">&#x2190</a>
+                <a class="btn btn-outline-dark " href="{% url 'cart' %}">&#x2190  Back to Cart</a>
                 <hr>
                 <h3>Order Summary</h3>
                 <hr>
                  <div class="cart-row">
                     <div style="flex:2"></div>
                     <div style="flex:3"><strong>Item</strong></div>
-                     <div style="flex:2"><strong>Price</strong></div>
+                     <div style="flex:3"><strong>Price</strong></div>
                     <div style="flex:2"><strong>Quantity</strong></div>
                     <div style="flex:3"><strong>Total</strong></div>
                 </div>
@@ -62,7 +64,7 @@
                 <div class="cart-row">
                     <div style="flex:2"><img class="row-image" src="{{ item.product.product_image.url }}" alt=""></div>
                     <div style="flex:3"><p>{{ item.product.name }}</p></div>
-                    <div style="flex:2"><p>{{item.product.price }}</p></div>
+                    <div style="flex:3"><p>Ksh. {{item.product.price }}</p></div>
                     <div style="flex:2"><p>x{{ item.quantity}}</p></div>
                     <div style="flex:3"><p>sh. {{ item.get_total|floatformat:2}}</p></div>
 
@@ -83,7 +85,87 @@
 
         </div>
     </div>
+    <script  >
+        var shipping = '{{ order.shipping}}'
+        var total = '{{ order.get_cart_total }}'
 
+        if ( shipping == 'False'){
+            document.getElementById('shipping-info').innerHTML = ''
+        }
+
+        if (user != 'AnonymousUser'){
+            document.getElementById('user-info').innerHTML= ''
+        }
+
+        if ( shipping == 'False' && user == user != 'AnonymousUser' ){
+            // Hide entire form if user is logged in and shipping is false
+            document.getElementById('form-wrapper').classList.add("hidden")
+
+            // show payment information if logged in user wants to buy an item that does not require shipping
+            document.getElementById('payment-info').classList.remove("hidden")
+
+        }
+
+        var form = document.getElementById('form')
+        form.addEventListener('submit', function(e){
+            e.preventDefault()
+            console.log('form submitted....')
+            document.getElementById('form-button').classList.add("hidden");
+            document.getElementById('payment-info').classList.remove("hidden");
+        })
+
+        document.getElementById('make-payment').addEventListener('click', function(e){
+            submitFormData()
+        })
+
+        function submitFormData(){
+            console.log('Payment button clicked...')
+
+            var userFormData = {
+                'name':null,
+                'email':null,
+                'total': total,
+            }
+
+            var shippingInfo = {
+                'address':null,
+                'city':null,
+                'state': null ,
+                'zipcode':null,
+            }
+
+            if (shipping != 'False'){
+                shippingInfo.address = form.address.value
+                shippingInfo.city = form.city.value
+                shippingInfo.state = form.state.value
+                shippingInfo.zipcode = form.zipcode.value
+            }
+
+            if (user == 'AnonymousUser'){
+                userFormData.name = form.name.value
+                userFormData.email = form.name.email
+            }
+
+            console.log('Shipping Info: ', shippingInfo)
+            console.log('User Info: ', userFormData)
+
+            var url = "/process-order/"
+            fetch(url, {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken' : csrftoken,
+                },
+                body:JSON.stringify({ 'form':userFormData, 'shipping':shippingInfo}),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success: ', data);
+                alert('Transaction completed');
+                window.location.href = "{% url 'store' %}"
+            })
+        }
+    </script>
 
 
 {% endblock content %}

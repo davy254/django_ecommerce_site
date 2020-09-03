@@ -4,11 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <title>My Soko</title>
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"  href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"  href="{% static 'css/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/main.css'%}">
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, minimum-scale=1 "/>
+
+    <script >
+              var user = '{{ request.user }}'
+
+              function getToken(name) {
+                  let cookieValue = null;
+                  if (document.cookie && document.cookie !== '') {
+                      const cookies = document.cookie.split(';');
+                      for (let i = 0; i < cookies.length; i++) {
+                          const cookie = cookies[i].trim();
+                          // Does this cookie string begin with the name we want?
+                          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                              break;
+                          }
+                      }
+                  }
+                  return cookieValue;
+              }
+              const csrftoken = getToken('csrftoken');
+     </script>
 
 </head>
 <body>
@@ -29,10 +50,10 @@
             <div class="form-inline my-2 my-lg-0">
                 <a href="#"class="btn btn-warning">Login</a>
 
-                <a href="">
-                    <img  id="cart-icon" src="{% static 'images/cart.png' %}">
+                <a href="{% url 'cart' %}">
+                    <img  id="cart-icon" src="{% static 'images/cart.png' %}" >
                 </a>
-                <p id="cart-total">10</p>
+                <p id="cart-total">{{ cartItems }}</p>
 
             </div>
           </div>
@@ -44,8 +65,9 @@
         {% endblock content%}
 
     </div>
-    <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
-    <script src="{% static 'css/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+        <script   type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+        <script type="text/javascript" src="{% static 'jquery-3.4.1.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'css/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
 </body>
 </html>
